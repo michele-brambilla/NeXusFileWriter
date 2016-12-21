@@ -8,12 +8,12 @@ std::string broker;
 std::string topic("test");
 
 struct MockConsumer {
-  static void process_data(void* data) {
+  virtual void process_data(void* data) {
     data_size = sizeof(*static_cast<int64_t*>(data));
   }
-  static int data_size;
+  int data_size=0;
 };
-int MockConsumer::data_size=0;
+
 
 TEST (Streamer, MissingTopicFailure) {
   ASSERT_THROW(Streamer(std::string(""),std::string("data_server:1234")),std::runtime_error);
@@ -23,17 +23,31 @@ TEST (Streamer, ConstructionSuccess) {
   ASSERT_NO_THROW(Streamer(topic,broker));
 }
 
-TEST (Streamer, Receive) {
-  Streamer s(topic,broker);
+TEST (Streamer, NoReceive) {
+  Streamer s(topic+"_no",broker);
   int f;
-  ASSERT_EQ( s.recv(f) , -1) ;
+  EXPECT_EQ( s.recv(f) , -1) ;
   
   std::function<void(void*)> f1 = [](void*) { std::cout << "hello!" << std::endl; };
-  ASSERT_NE( s.recv(f1), -1);
+  ASSERT_THROW( s.recv(f1),std::runtime_error);
+}
 
+TEST (Streamer, Receive) {
+  Streamer s(topic,broker);
+  
+  // int data_size = 0;
+  // std::function<void(void*)> f1 = [&](void*) { std::cout << "hello!" << std::endl; data_size++; return; };
+  // ASSERT_NO_THROW( s.recv(f1) );
+  // EXPECT_GT(data_size,0);
+  
   MockConsumer m;
-  s.recv(m.process_data);
-  ASSERT_GT(m.data_size,0);
+  int counter = 0;
+  std::function<void(void*)> f = std::bind(&MockConsumer::process_data,&m, std::placeholders::_1);
+  while(s.recv(f)) {
+    EXPECT_GT(m.data_size,0);
+    ++counter;
+  }
+  std::cout << "num messages received: " << counter << std::endl;
 }
 
 

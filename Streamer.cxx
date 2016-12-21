@@ -37,18 +37,23 @@ Streamer::Streamer(const std::string& topic_name, const std::string& broker) {
 
 }
 
-Streamer::~Streamer() {
-  consumer->stop(topic,partition);
-  delete consumer;
-  delete topic;
-  RdKafka::wait_destroyed(5000);
-}
+// Streamer::~Streamer() {
+//   consumer->stop(topic,partition);
+//   delete consumer;
+//   delete topic;
+//   //  RdKafka::wait_destroyed(5000);
+// }
 
 template<>
 int Streamer::recv(std::function<void(void*)>& f) {
   bool success = false;
   RdKafka::Message *msg = consumer->consume(topic, partition, 1000);
+  if( msg->err() ==  RdKafka::ERR__PARTITION_EOF) {
+    std::cout << "eof reached" << std::endl;
+    return 0;
+  }
   if( msg->err() !=  RdKafka::ERR_NO_ERROR) {
+    std::cout << RdKafka::err2str(msg->err()) << std::endl;
     throw std::runtime_error("Failed to consume message: "+RdKafka::err2str(msg->err()));
   }
   success = recv_impl(f,msg->payload());
@@ -57,7 +62,7 @@ int Streamer::recv(std::function<void(void*)>& f) {
 
 template<>
 int Streamer::recv_impl(std::function<void(void*)>& f,void* payload) {
-  RdKafka::Message *msg = consumer->consume(topic, partition, 10);
+  RdKafka::Message *msg = consumer->consume(topic, partition, 10);  
   f(payload);
   return 1;
 }

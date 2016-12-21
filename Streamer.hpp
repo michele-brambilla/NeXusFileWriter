@@ -18,11 +18,11 @@ class Streamer {
 public:
   Streamer(const std::string& topic, const std::string& server);
   Streamer(const Streamer& other); // MISSING
-  ~Streamer(); // disconnect
+  //  ~Streamer(); // disconnect
 
   // receives from stream and apply callback
   template<class T>
-  int recv(T& f) { return -1; }
+  int recv(T& f) { std::cout << "fake_recv\n"; return -1; }
   
 private:
   RdKafka::Topic *topic;
