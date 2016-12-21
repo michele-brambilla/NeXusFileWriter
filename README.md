@@ -16,7 +16,8 @@ Initial implementation and tests.
 ## Running tests
 
     Usage:
-    ```tests/streamer_test --kafka_broker=<broker>:<port>  --kafka_topic="<topic
+    ```bash
+        tests/streamer_test --kafka_broker=<broker>:<port>  --kafka_topic="<topic
         name>"```
     Tests are implemented using the gtest suite. They support all the command
     line option provided by gtest.
