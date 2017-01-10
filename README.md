@@ -10,6 +10,9 @@ acts according to the function passed as argument (the idea is that the
 function is defined in StreamMaster)
 
 
+
+
+
 ## Running tests
 
 Usage:

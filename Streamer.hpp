@@ -16,23 +16,29 @@ namespace RdKafka {
 // actually a "kafka streamer"
 class Streamer {
 public:
-  Streamer(const std::string& topic, const std::string& server);
-  Streamer(const Streamer& other); // MISSING
+  Streamer() : offset(0) { };
+  Streamer(const std::string&, const std::string&);
+  Streamer(const Streamer&);
+  
   //  ~Streamer(); // disconnect
 
   // receives from stream and apply callback
   template<class T>
   int recv(T& f) { std::cout << "fake_recv\n"; return -1; }
+
+  int connect(const std::string&, const std::string&);
+  int disconnect();
   
 private:
   RdKafka::Topic *topic;
   RdKafka::Consumer *consumer;
   int32_t partition = 0;
+  uint64_t offset;
+  //  size_t message_length;
   
   template<class T>
   int recv_impl(T& f, void*) { };
 };
-
 
 
 template<> int Streamer::recv<std::function<void(void*)> >(std::function<void(void*)>&);

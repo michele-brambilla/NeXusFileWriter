@@ -22,7 +22,7 @@ include_directories( ${PROJECT_SOURCE_DIR} ${RDKAFKA_DIR}/include )
 
 link_directories("${RDKAFKA_DIR}/lib")
 
-add_library( NeXusFileWriter Streamer.cxx)
+add_library( NeXusFileWriter Streamer.cxx StreamMaster.cxx)
 
 add_executable(test test.cxx)
 target_link_libraries (test rdkafka rdkafka++ NeXusFileWriter)

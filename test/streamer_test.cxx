@@ -26,11 +26,19 @@ TEST (Streamer, ConstructionSuccess) {
 TEST (Streamer, NoReceive) {
   Streamer s(topic+"_no",broker);
   int f;
-  EXPECT_EQ( s.recv(f) , -1) ;
-  
+  EXPECT_FALSE( s.recv(f) == 0) ;
   std::function<void(void*)> f1 = [](void*) { std::cout << "hello!" << std::endl; };
-  ASSERT_THROW( s.recv(f1),std::runtime_error);
+  ASSERT_FALSE( s.recv(f1) == 0);
 }
+
+
+TEST (Streamer, Reconnect) {
+  Streamer s(topic,broker);
+  EXPECT_EQ(s.disconnect(),0);
+  EXPECT_EQ(s.connect(topic,broker),0);
+}
+
+
 
 TEST (Streamer, Receive) {
   Streamer s(topic,broker);
