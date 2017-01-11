@@ -1,7 +1,6 @@
 #include <Streamer.hpp>
-#include <librdkafka/rdkafkacpp.h>
-
-
+//#include <librdkafka/rdkafkacpp.h>
+#include <KafkaMock.hpp>
 
 
 Streamer::Streamer(const std::string& topic_name, const std::string& broker) {
@@ -86,8 +85,10 @@ int Streamer::connect(const std::string& topic_name, const std::string& broker) 
 }
 
 
+/// Method specialisation for a functor with signature void f(void*). The
+/// method applies f to the message payload.
 template<>
-int Streamer::recv(std::function<void(void*)>& f) {
+bool Streamer::recv(std::function<void(void*)>& f) {
   bool success = false;
   RdKafka::Message *msg = consumer->consume(topic, partition, 1000);
   if( msg->err() == RdKafka::ERR__PARTITION_EOF) {
@@ -99,14 +100,22 @@ int Streamer::recv(std::function<void(void*)>& f) {
     return msg->err();
   }
   success = recv_impl(f,msg->payload());
-  //  message_length = msg->len();
-  return 0;
+  std::cout << " message_length = msg->len()" << std::endl;
+  message_length = msg->len();
+  return success;
 }
-
 template<>
-int Streamer::recv_impl(std::function<void(void*)>& f,void* payload) {
-  RdKafka::Message *msg = consumer->consume(topic, partition, 10);  
+bool Streamer::recv_impl(std::function<void(void*)>& f,void* payload) {
   f(payload);
-  return 1;
+  return true;
 }
 
+
+
+/// Implements some algorithm in order to search in the kafka queue the first
+/// message with timestamp >= the timestam of beginning of data taking 
+/// (assumed to be stored in Source)
+template<>
+bool Streamer::search_backward(std::function<void(void*)>& f) {
+  return false;
+}

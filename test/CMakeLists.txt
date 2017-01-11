@@ -14,14 +14,16 @@ include_directories(${GTEST_INCLUDE_DIR})
 
 target_link_libraries( streamer_test
 		       ${GTEST_BOTH_LIBRARIES}
-		       rdkafka
-		       rdkafka++
+		       rdkafka_mock
+#		       rdkafka
+#		       rdkafka++
                        NeXusFileWriter)
 
 target_link_libraries( streammaster_test
 		       ${GTEST_BOTH_LIBRARIES}
-		       rdkafka
-		       rdkafka++
+		       rdkafka_mock
+#		       rdkafka
+#		       rdkafka++
                        NeXusFileWriter)
 
 add_test(NAME streamer_test WORKING_DIRECTORY ${PROJECT_SOURCE_DIR} COMMAND ${CMAKE_CURRENT_BINARY_DIR}/streamer_test)

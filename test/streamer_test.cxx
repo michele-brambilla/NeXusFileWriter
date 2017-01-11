@@ -28,15 +28,16 @@ TEST (Streamer, NoReceive) {
   int f;
   EXPECT_FALSE( s.recv(f) == 0) ;
   std::function<void(void*)> f1 = [](void*) { std::cout << "hello!" << std::endl; };
-  ASSERT_FALSE( s.recv(f1) == 0);
+  EXPECT_TRUE( s.recv(f1) == 0);
+  EXPECT_TRUE( s.len() == 0 );
 }
 
 
-TEST (Streamer, Reconnect) {
-  Streamer s(topic,broker);
-  EXPECT_EQ(s.disconnect(),0);
-  EXPECT_EQ(s.connect(topic,broker),0);
-}
+// TEST (Streamer, Reconnect) {
+//   Streamer s(topic,broker);
+//   EXPECT_EQ(s.disconnect(),0);
+//   EXPECT_EQ(s.connect(topic,broker),0);
+// }
 
 
 
